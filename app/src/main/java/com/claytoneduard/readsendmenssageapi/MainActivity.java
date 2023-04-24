@@ -74,7 +74,12 @@ public class MainActivity extends AppCompatActivity {
                         txtResultado.setText("Dados Capturados da API com sucesso!");
                     }
                 }
-                enviarSMS(todos.getTitle().toString());
+                if(enviarSMS(todos.getTitle())) {
+                   Toast.makeText(MainActivity.this, "Envio de SMS realizado! \n " + todos.getTitle(), Toast.LENGTH_LONG).show();
+                }else if(!enviarSMS(todos.getTitle())){
+                    Toast.makeText(MainActivity.this, "Erro ao enviar SMS", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -87,10 +92,11 @@ public class MainActivity extends AppCompatActivity {
 
     // Enviar mensagem
 
-    private void enviarSMS(String msg) {
+    private boolean enviarSMS(String msg) {
         // key disponibilizada pelo site, essa chave posso usar somente 10 envios de testes.
         String key = "BKAVQ8WFL58HNJJR0287K2JN20WVUEDVAIQPQW4UEWDV7HJIOZ9EMFVDK6QLNAAWOZ7EGNLFZM2SK26QZ59GT99VPHBD7EQ2VL9O54XNLC76I14KC02GKJRDGISO2BHU";
-        Sms sms = new Sms(key, 9, 64992118865L, "Consegui te fazer um esboso do projeto!");
+        Sms sms = new Sms(key, 9, 64992118865L, "Consegui fazer um esboso do projeto!");
+
         Call<Sms> call = serviceSms.enviarSMS(sms);
         call.enqueue(new Callback<Sms>() {
             @Override
@@ -99,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     Sms smsEnvio = response.body();
                     txtResultado.setText("Código: " + response.code() +
                             "Numero: " + smsEnvio.getNumber() + " Mensagem: " + smsEnvio.getMsg());
-                    Toast.makeText(MainActivity.this, "Envio de SMS realizado! \n" + msg, Toast.LENGTH_LONG).show();
+                    return;
                 }
             }
 
@@ -108,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("SMS Service  ", "Erro ao enviar sms" + t.getMessage());
             }
         });
+        return true;
     }
 
 
